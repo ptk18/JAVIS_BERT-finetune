@@ -9,6 +9,20 @@ intent_labels = {"draw_shape": 0, "invalid_shape": 1}
 #Valid shapes
 VALID_SHAPES = {"circle", "square", "triangle", "rectangle"}
 
+def detect_negation(text, shape_start):
+    negation_words = ["not", "don't", "never", "no", "can't", "wont","dont","cant","cannot","won't","arent","aren't","ain't","aint"]
+    
+    # Tokenize the text before the shape appears
+    before_shape = text[:shape_start].lower().split()
+
+    # Check if any negation word appears before the shape
+    for neg_word in negation_words:
+        if neg_word in before_shape:
+            return True  # Negation detected
+
+    return False  # No negation detected
+
+
 
 #Converting entity labels into token-level using BIO(Begin, Inside, O) tagging scheme
 def align_entity_labels(text, entities, tokenizer):
@@ -53,34 +67,86 @@ def align_entity_labels(text, entities, tokenizer):
     
     return tokens, labels, label_ids
 
+# def process_input_file(input_file, output_file):
+#     with open(input_file, "r") as f:
+#         lines = f.readlines()
+
+#     preprocessed_data = []
+#     for line in lines:
+#         text = line.strip()  #Remove leading/trailing whitespace
+#         if not text:
+#             continue  #Skip empty lines
+
+#         #Extract entities (shapes) from the text
+#         entities = []
+#         for word in text.split():
+#             if word.lower() in VALID_SHAPES:
+#                 entities.append({
+#                     "word": word.lower(),
+#                     "start": text.lower().index(word.lower()),
+#                     "end": text.lower().index(word.lower()) + len(word)
+#                 })
+
+#         #Tokenize and align entity labels
+#         tokens, labels, label_ids = align_entity_labels(text, entities, tokenizer)
+
+#         #Assign intent label
+#         if entities:
+#             intent_label = intent_labels["draw_shape"]
+#         else:
+#             intent_label = intent_labels["invalid_shape"]
+
+#         preprocessed_data.append({
+#             "text": text,
+#             "tokens": tokens,
+#             "intent_label": intent_label,
+#             "entity_labels": label_ids
+#         })
+
+#     with open(output_file, "w") as f:
+#         json.dump(preprocessed_data, f, indent=4)
+
+#     print(f"Processed data saved to {output_file}")
 def process_input_file(input_file, output_file):
     with open(input_file, "r") as f:
         lines = f.readlines()
 
     preprocessed_data = []
+    
     for line in lines:
-        text = line.strip()  #Remove leading/trailing whitespace
+        text = line.strip()
         if not text:
-            continue  #Skip empty lines
+            continue
 
-        #Extract entities (shapes) from the text
         entities = []
+        has_negation = False
+
+        # Extract all valid shapes from text
         for word in text.split():
-            if word.lower() in VALID_SHAPES:
+            word_lower = word.lower().strip(".")  # Remove trailing punctuation
+            if word_lower in VALID_SHAPES:
+                start_idx = text.lower().index(word_lower)
+                end_idx = start_idx + len(word_lower)
+                
+                # Detect negation before this shape
+                if detect_negation(text, start_idx):
+                    has_negation = True  # Mark sentence as negated
+                
+                # Store valid shape entity
                 entities.append({
-                    "word": word.lower(),
-                    "start": text.lower().index(word.lower()),
-                    "end": text.lower().index(word.lower()) + len(word)
+                    "word": word_lower,
+                    "start": start_idx,
+                    "end": end_idx
                 })
 
-        #Tokenize and align entity labels
-        tokens, labels, label_ids = align_entity_labels(text, entities, tokenizer)
-
-        #Assign intent label
-        if entities:
-            intent_label = intent_labels["draw_shape"]
-        else:
+        # If any shape is negated, classify as invalid intent
+        if has_negation:
             intent_label = intent_labels["invalid_shape"]
+        else:
+            intent_label = intent_labels["draw_shape"] if entities else intent_labels["invalid_shape"]
+
+        # Tokenize and align entity labels for multiple shapes
+        tokens, labels, label_ids = align_entity_labels(text, entities, tokenizer)
 
         preprocessed_data.append({
             "text": text,
@@ -93,6 +159,7 @@ def process_input_file(input_file, output_file):
         json.dump(preprocessed_data, f, indent=4)
 
     print(f"Processed data saved to {output_file}")
+
 
 # Example usage
 # input_file = "input.txt"

@@ -1,7 +1,9 @@
 [
     {
-        "text": "please draw a triangle",
+        "text": "could you please draw a triangle",
         "tokens": [
+            "could",
+            "you",
             "please",
             "draw",
             "a",
@@ -9,6 +11,8 @@
         ],
         "intent_label": 0,
         "entity_labels": [
+            0,
+            0,
             0,
             0,
             0,

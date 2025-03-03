@@ -14,6 +14,6 @@ def transcribe_audio(audio_file):
     cleaned_text = clean_text(result)
     return cleaned_text
 
-# audio_file = "audios/circle.mp3"
+# audio_file = "audios/flower.mp3"
 # text = transcribe_audio(audio_file)
 # print(f"Transcribed text: {text}")
