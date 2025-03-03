@@ -1,53 +1,36 @@
-# from transformers import pipeline
+from speech_to_text import transcribe_audio
+from BERT_JAVIS_finetune import process_input_file
+import json
 
-from transformers import AutoModelForSequenceClassification, AutoTokenizer, pipeline
+def main(audio_file):
+    #audio to text
+    text = transcribe_audio(audio_file).lower()
+    print(f"Transcribed text from audio: {text}")
 
-model_name = "joeddav/xlm-roberta-large-xnli"
+    input_file = "command.txt"
+    with open(input_file, "w") as f:
+        f.write(text)
 
-# Load the tokenizer manually
-tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False)
+    output_file = "command.json"
+    process_input_file(input_file, output_file)
 
-# Load the model
-model = AutoModelForSequenceClassification.from_pretrained(model_name)
+    with open(output_file, "r") as f:
+        data = json.load(f)
 
-# Create the pipeline
-intent_classifier = pipeline("text-classification", model=model, tokenizer=tokenizer)
+    if data:
+        result = data[0]
+        intent_label = result["intent_label"]
+        tokens = result["tokens"]
+        entity_labels = result["entity_labels"]
 
-
-# Load models
-speech_to_text = pipeline("automatic-speech-recognition", model="openai/whisper-small")
-# intent_classifier = pipeline("text-classification", model="distilbert-base-uncased")
-# intent_classifier = pipeline("text-classification", model="joeddav/xlm-roberta-large-xnli")
-# intent_classifier = pipeline("text-classification", model="distilbert-base-uncased-finetuned-sst-2-english")
-#intent_classifier = pipeline("text-classification", model="joeddav/xlm-roberta-large-xnli", use_fast=False)
-
-
-# Function to transcribe audio
-def transcribe_audio(audio_file):
-    result = speech_to_text(audio_file)
-    return result["text"]
-
-# Function to classify intent
-def classify_intent(command):
-    result = intent_classifier(command)
-    return result[0]["label"]
-
-# Function to execute commands
-def execute_command(command):
-    intent = classify_intent(command)
-    print(f"intent is {intent}")
-    if intent == "draw_circle":
-        print("Drawing a circle...")
-    elif intent == "fill_circle":
-        print("Filling circle with color...")
+        if intent_label == 0:
+            shape_tokens = [token.replace("##", "") for token, label in zip(tokens, entity_labels) if label == 1 or label == 2]
+            shape = " ".join(shape_tokens)
+            print(f"Drawing a {shape}...")
+        else:
+            print("Invalid shape. Cannot draw.")
     else:
-        print("Sorry, I didn't understand that.")
+        print("No valid input found.")
 
-def main():
-    audio_file = "audios/circle.mp3" 
-    command = transcribe_audio(audio_file)
-    print(f"Command: {command}")
-    execute_command(command)
-
-if __name__ == "__main__":
-    main()
+audio_file = "audios/triangle.mp3"
+main(audio_file)

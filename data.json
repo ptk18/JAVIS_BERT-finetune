@@ -1,0 +1,108 @@
+[
+    {
+        "text": "Draw a circle .",
+        "tokens": [
+            "draw",
+            "a",
+            "circle",
+            "."
+        ],
+        "intent_label": 0,
+        "entity_labels": [
+            0,
+            0,
+            1,
+            0
+        ]
+    },
+    {
+        "text": "A circle please",
+        "tokens": [
+            "a",
+            "circle",
+            "please"
+        ],
+        "intent_label": 0,
+        "entity_labels": [
+            0,
+            1,
+            0
+        ]
+    },
+    {
+        "text": "Could you please draw a circle",
+        "tokens": [
+            "could",
+            "you",
+            "please",
+            "draw",
+            "a",
+            "circle"
+        ],
+        "intent_label": 0,
+        "entity_labels": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+        ]
+    },
+    {
+        "text": "Hello",
+        "tokens": [
+            "hello"
+        ],
+        "intent_label": 1,
+        "entity_labels": [
+            0
+        ]
+    },
+    {
+        "text": "Draw a flower",
+        "tokens": [
+            "draw",
+            "a",
+            "flower"
+        ],
+        "intent_label": 1,
+        "entity_labels": [
+            0,
+            0,
+            0
+        ]
+    },
+    {
+        "text": "Draw a triangle",
+        "tokens": [
+            "draw",
+            "a",
+            "triangle"
+        ],
+        "intent_label": 0,
+        "entity_labels": [
+            0,
+            0,
+            1
+        ]
+    },
+    {
+        "text": "Please draw a rectangle",
+        "tokens": [
+            "please",
+            "draw",
+            "a",
+            "rec",
+            "##tangle"
+        ],
+        "intent_label": 0,
+        "entity_labels": [
+            0,
+            0,
+            0,
+            1,
+            2
+        ]
+    }
+]

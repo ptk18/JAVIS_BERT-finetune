@@ -1,0 +1,18 @@
+[
+    {
+        "text": "please draw a triangle",
+        "tokens": [
+            "please",
+            "draw",
+            "a",
+            "triangle"
+        ],
+        "intent_label": 0,
+        "entity_labels": [
+            0,
+            0,
+            0,
+            1
+        ]
+    }
+]
